@@ -1,7 +1,6 @@
 import java.io.FileWriter
 
 fun main() {
-    findCrossWords()
 }
 
 fun findBestTTTWord() {

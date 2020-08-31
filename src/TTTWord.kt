@@ -39,16 +39,16 @@ internal class TTTWord(private val word: String) {
         var startScore = 0
         var endScore = 0
 
-        with(WordData.bestStartCross) {
-            startScore += getValue(word[0]).score
-            startScore += getValue(word[7]).score
-            startScore += getValue(word[14]).score
-        }
-        with(WordData.bestEndCross) {
-            endScore += getValue(word[0]).score
-            endScore += getValue(word[7]).score
-            endScore += getValue(word[14]).score
-        }
+//        with(WordData.startWordsByScore) {
+//            startScore += getValue(word[0]).score
+//            startScore += getValue(word[7]).score
+//            startScore += getValue(word[14]).score
+//        }
+//        with(WordData.endWordsByScore) {
+//            endScore += getValue(word[0]).score
+//            endScore += getValue(word[7]).score
+//            endScore += getValue(word[14]).score
+//        }
 
         if (startScore > endScore) {
             sideOfCrossWords = WordPosition.START

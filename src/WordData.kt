@@ -1,42 +1,54 @@
 import java.io.FileReader
 import java.io.IOException
 import java.io.Reader
-import kotlin.system.exitProcess
 
 private const val DICT_PATH = "scrabble_dict.txt"
-private const val CROSS_PATH = "cross_words.txt"
+private const val START_WORDS_PATH = "start_words.txt"
+private const val END_WORDS_PATH = "end_words.txt"
 
-data class WordAndScore(val word: String, val score: Int)
+data class Word(val word: String) {
+    val score = wordScore(word)
+    val letterCounts = LetterCounts(word)
+}
 
 object WordData {
     val words: Set<String>
     val wordsByLength: Map<Int, List<String>>
-    val bestStartCross: Map<Char, WordAndScore>
-    val bestEndCross: Map<Char, WordAndScore>
+    val startWordsByScore: Map<Char, List<Word>>
+    val endWordsByScore: Map<Char, List<Word>>
 
     init {
         val words = mutableSetOf<String>()
         val wordsByLength = mutableMapOf<Int, MutableList<String>>()
-        val bestStartCross = mutableMapOf<Char, WordAndScore>()
-        val bestEndCross = mutableMapOf<Char, WordAndScore>()
+        val startWordsByScore = mutableMapOf<Char, List<Word>>()
+        val endWordsByScore = mutableMapOf<Char, List<Word>>()
 
         val dictFileReader: Reader
-        val crossFileReader: Reader
+        val startWordsReader: Reader
+        val endWordsReader: Reader
         try {
             dictFileReader = FileReader(DICT_PATH).buffered()
-            crossFileReader = FileReader(CROSS_PATH).buffered()
+            startWordsReader = FileReader(START_WORDS_PATH).buffered()
+            endWordsReader = FileReader(END_WORDS_PATH).buffered()
         } catch (e: IOException) {
             e.printStackTrace()
-            exitProcess(1)
+            error("File not found")
         }
 
         dictFileReader.forEachLine { words.add(it) }
-        crossFileReader.forEachLine {
-            val values = it.split(',')
+        startWordsReader.forEachLine { line ->
+            val values = line.split(',')
             val letter = values[0][0]
-            bestStartCross[letter] = WordAndScore(values[1], values[3].toInt())
-            bestEndCross[letter] = WordAndScore(values[2], values[4].toInt())
+            val wordStrings = values.subList(1, values.size)
+            startWordsByScore[letter] = wordStrings.map { Word(it) }
         }
+        endWordsReader.forEachLine { line ->
+            val values = line.split(',')
+            val letter = values[0][0]
+            val wordStrings = values.subList(1, values.size)
+            endWordsByScore[letter] = wordStrings.map { Word(it) }
+        }
+
 
         words.forEach {
             val lengthList = wordsByLength.getOrPut(it.length) { mutableListOf() }
@@ -45,8 +57,8 @@ object WordData {
 
         this.words = words
         this.wordsByLength = wordsByLength
-        this.bestStartCross = bestStartCross
-        this.bestEndCross = bestEndCross
+        this.startWordsByScore = startWordsByScore
+        this.endWordsByScore = endWordsByScore
     }
 }
 
