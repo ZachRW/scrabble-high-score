@@ -1,7 +1,7 @@
 class LetterCounts {
-    private val counts: Map<Char, Int>
+    private val counts: LetterToInt
 
-    constructor(counts: Map<Char, Int>) {
+    constructor(counts: LetterToInt) {
         this.counts = counts
     }
 
@@ -10,22 +10,19 @@ class LetterCounts {
         for (letter in word) {
             mutableCounts[letter] = mutableCounts.getOrDefault(letter, 0) + 1
         }
-        counts = mutableCounts
+        counts = LetterToInt(mutableCounts)
     }
 
-    operator fun plus(other: LetterCounts): LetterCounts {
-        val result = counts.toMutableMap()
-        for ((key, value) in other.counts) {
-            result[key] = result.getOrDefault(key, 0) + value
-        }
+    operator fun plus(other: LetterCounts) = LetterCounts(counts + other.counts)
 
-        return LetterCounts(result)
-    }
-
-    fun withinLetterDistribution() =
-            counts.all { (key, value) ->
-                 value <= letterDistribution.counts.getOrDefault(key, 0)
+    fun withinLetterDistribution(): Boolean {
+        for (i in 0 until counts.size) {
+            if (counts[i] > letterDistribution.counts[i]) {
+                return false
             }
+        }
+        return true
+    }
 }
 
 fun List<Word>.getAllValidHavingUsed(counts: LetterCounts): List<Word> {
@@ -46,7 +43,7 @@ fun List<Word>.getAllValidHavingUsed(vararg words: Word): List<Word> {
 
 fun List<Word>.getAllValid(): List<Word> = getAllValidHavingUsed()
 
-private val letterDistribution = LetterCounts(mapOf(
+private val letterDistribution = LetterCounts(LetterToInt(mapOf(
         'e' to 12,
         'a' to 9,
         'i' to 9,
@@ -73,4 +70,4 @@ private val letterDistribution = LetterCounts(mapOf(
         'x' to 1,
         'q' to 1,
         'z' to 1
-))
+)))

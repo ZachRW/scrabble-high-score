@@ -9,8 +9,8 @@ internal class TTTWord(private val word: Word) {
     init {
         var score = word.score * 27
 
-        val bestStartWords = bestCrossWords(WordData.startWordsByScore)
-        val bestEndWords = bestCrossWords(WordData.endWordsByScore)
+        val bestStartWords = bestCrossWords(WordData.START_WORDS_BY_SCORE)
+        val bestEndWords = bestCrossWords(WordData.END_WORDS_BY_SCORE)
 
         val startScore = bestStartWords.score()
         val endScore = bestEndWords.score()
@@ -30,8 +30,8 @@ internal class TTTWord(private val word: Word) {
     fun scoreUpperLimit(): Int {
         var score = word.score
 
-        val startScoreUpperLimit = crossWordScoreUpperLimit(WordData.startWordsByScore)
-        val endScoreUpperLimit = crossWordScoreUpperLimit(WordData.endWordsByScore)
+        val startScoreUpperLimit = crossWordScoreUpperLimit(WordData.START_WORDS_BY_SCORE)
+        val endScoreUpperLimit = crossWordScoreUpperLimit(WordData.END_WORDS_BY_SCORE)
 
         score += maxOf(startScoreUpperLimit, endScoreUpperLimit)
 
@@ -58,12 +58,13 @@ internal class TTTWord(private val word: Word) {
         return bestScore
     }
 
-    private fun crossWordScoreUpperLimit(wordsByScore: Map<Char, List<Word>>): Int = wordsByScore.getValue(word.string[0]).score() +
-            wordsByScore.getValue(word.string[7]).score() +
-            wordsByScore.getValue(word.string[14]).score()
+    private fun crossWordScoreUpperLimit(wordsByScore: LetterArrayMap<List<Word>>): Int =
+            wordsByScore[word.string[0]].score() +
+                    wordsByScore[word.string[7]].score() +
+                    wordsByScore[word.string[14]].score()
 
 
-    private fun bestCrossWords(wordsByScore: Map<Char, List<Word>>): List<Word> {
+    private fun bestCrossWords(wordsByScore: LetterArrayMap<List<Word>>): List<Word> {
         val letterCounts = mutableMapOf<Char, Int>()
         for (letter in word.string) {
             letterCounts[letter] = letterCounts.getOrDefault(letter, 0) + 1
@@ -72,13 +73,15 @@ internal class TTTWord(private val word: Word) {
         var bestScore = 0
         var bestWords = listOf<Word>()
 
-        val words1 = wordsByScore.getValue(word.string[0]).getAllValid()
+        val words1 = wordsByScore[word.string[0]].getAllValid()
 
         for (word1 in words1) {
-            val words2 = wordsByScore.getValue(word.string[7]).getAllValidHavingUsed(word1)
+            println(word1)
+
+            val words2 = wordsByScore[word.string[7]].getAllValidHavingUsed(word1)
 
             for (word2 in words2) {
-                val words3 = wordsByScore.getValue(word.string[14]).getAllValidHavingUsed(word1, word2)
+                val words3 = wordsByScore[word.string[14]].getAllValidHavingUsed(word1, word2)
                 if (words3.isEmpty()) continue
 
                 val word3 = words3[0]

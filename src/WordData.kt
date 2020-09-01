@@ -18,8 +18,8 @@ fun List<Word>.score() = sumBy { it.score }
 object WordData {
     val words: Set<String>
     val wordsByLength: Map<Int, List<Word>>
-    val startWordsByScore: Map<Char, List<Word>>
-    val endWordsByScore: Map<Char, List<Word>>
+    val START_WORDS_BY_SCORE: LetterArrayMap<List<Word>>
+    val END_WORDS_BY_SCORE: LetterArrayMap<List<Word>>
 
     init {
         val words = mutableSetOf<String>()
@@ -61,8 +61,8 @@ object WordData {
 
         this.words = words
         this.wordsByLength = wordsByLength
-        this.startWordsByScore = startWordsByScore
-        this.endWordsByScore = endWordsByScore
+        this.START_WORDS_BY_SCORE = LetterArrayMap<List<Word>>(startWordsByScore, emptyList())
+        this.END_WORDS_BY_SCORE = LetterArrayMap<List<Word>>(endWordsByScore, emptyList())
     }
 }
 
