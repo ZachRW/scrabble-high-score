@@ -24,7 +24,7 @@ class LetterCounts {
 
     fun withinLetterDistribution() =
             counts.all { (key, value) ->
-                letterDistribution.counts.getOrDefault(key, 0) <= value
+                 value <= letterDistribution.counts.getOrDefault(key, 0)
             }
 }
 
@@ -33,6 +33,18 @@ fun List<Word>.getAllValidHavingUsed(counts: LetterCounts): List<Word> {
     mutable.removeIf { !(it.letterCounts + counts).withinLetterDistribution() }
     return mutable
 }
+
+fun List<Word>.getAllValidHavingUsed(vararg words: Word): List<Word> {
+    val countsList = words.map { it.letterCounts }
+    var totalCounts = LetterCounts("")
+    for (counts in countsList) {
+        totalCounts += counts
+    }
+
+    return getAllValidHavingUsed(totalCounts)
+}
+
+fun List<Word>.getAllValid(): List<Word> = getAllValidHavingUsed()
 
 private val letterDistribution = LetterCounts(mapOf(
         'e' to 12,

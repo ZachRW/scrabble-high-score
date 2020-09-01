@@ -2,8 +2,8 @@ internal class TTTPermutation {
     private val word: String
     private val substrings: MutableList<Substring>
 
-    constructor(word: String) {
-        this.word = word
+    constructor(word: Word) {
+        this.word = word.string
         substrings = mutableListOf(
                 Substring(1, 6),
                 Substring(8, 2)

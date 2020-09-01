@@ -6,20 +6,24 @@ private const val DICT_PATH = "scrabble_dict.txt"
 private const val START_WORDS_PATH = "start_words.txt"
 private const val END_WORDS_PATH = "end_words.txt"
 
-data class Word(val word: String) {
-    val score = wordScore(word)
-    val letterCounts = LetterCounts(word)
+data class Word(val string: String) {
+    val score = wordScore(string)
+    val letterCounts = LetterCounts(string)
+
+    override fun toString() = string
 }
+
+fun List<Word>.score() = sumBy { it.score }
 
 object WordData {
     val words: Set<String>
-    val wordsByLength: Map<Int, List<String>>
+    val wordsByLength: Map<Int, List<Word>>
     val startWordsByScore: Map<Char, List<Word>>
     val endWordsByScore: Map<Char, List<Word>>
 
     init {
         val words = mutableSetOf<String>()
-        val wordsByLength = mutableMapOf<Int, MutableList<String>>()
+        val wordsByLength = mutableMapOf<Int, MutableList<Word>>()
         val startWordsByScore = mutableMapOf<Char, List<Word>>()
         val endWordsByScore = mutableMapOf<Char, List<Word>>()
 
@@ -52,7 +56,7 @@ object WordData {
 
         words.forEach {
             val lengthList = wordsByLength.getOrPut(it.length) { mutableListOf() }
-            lengthList.add(it)
+            lengthList.add(Word(it))
         }
 
         this.words = words

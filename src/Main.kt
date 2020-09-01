@@ -1,6 +1,7 @@
 import java.io.FileWriter
 
 fun main() {
+    findBestTTTWord()
 }
 
 fun findBestTTTWord() {
@@ -26,6 +27,7 @@ fun findBestTTTWord() {
     for (tttWord in bestTTTWords) {
         println("$tttWord: $bestScore")
         println(tttWord.sideOfCrossWords)
+        println(tttWord.crossWords)
     }
 }
 
@@ -57,7 +59,7 @@ fun findCrossWords() {
 fun writeSortedCrossWordsToFile(wordMap: Map<Char, MutableSet<String>>, fileName: String) {
     FileWriter(fileName).buffered().use { writer ->
         for ((letter, words) in wordMap) {
-            val sortedWords: List<String> = words.sortedBy { wordScore(it) }
+            val sortedWords: List<String> = words.sortedBy { wordScore(it) }.reversed()
 
             writer.write("$letter")
             for (word in sortedWords) {
