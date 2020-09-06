@@ -15,7 +15,22 @@ internal class TTTPermutation {
         substrings = permutation.substrings.map { Substring(it) }.toMutableList()
     }
 
-    fun score(baseScore: Int): Int {
+    fun findBest() {
+        val upperLimit = letterScore(word[3]) * 27 + letterScore(word[11]) * 27
+
+        var bestScore = 0
+        while (nextValid()) {
+            val score = score()
+            if (score == upperLimit) {
+                return
+            }
+            if (score > bestScore) {
+                bestScore = score
+            }
+        }
+    }
+
+    fun score(): Int {
         var firstDL = true
         var secondDL = true
         for (substring in substrings) {
@@ -27,7 +42,7 @@ internal class TTTPermutation {
             }
         }
 
-        var score = baseScore
+        var score = 0
         if (firstDL) {
             score += letterScore(word[3]) * 27
         }

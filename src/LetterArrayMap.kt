@@ -37,7 +37,7 @@ class LetterToInt : LetterArrayMap<Int> {
     operator fun plus(other: LetterToInt): LetterToInt {
         val result = LetterToInt()
 
-        for (i in 0 until ARRAY_SIZE) {
+        for (i in array.indices) {
             result[i] = this[i] + other[i]
         }
 
@@ -45,7 +45,7 @@ class LetterToInt : LetterArrayMap<Int> {
     }
 }
 
-private const val ARRAY_SIZE = 'z'.toInt() - 'a'.toInt()
+private const val ARRAY_SIZE = 'z'.toInt() - 'a'.toInt() + 1
 private const val CHAR_OFFSET = 'a'.toInt()
 private fun Char.toIndex() = toInt() - CHAR_OFFSET
 private fun Int.toCharKey() = toChar() + CHAR_OFFSET

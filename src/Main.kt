@@ -4,31 +4,16 @@ fun main() {
     findBestTTTWord()
 }
 
+var bestTTTWord: TTTWord? = null
+
 fun findBestTTTWord() {
-    val bestTTTWords = mutableListOf<TTTWord>()
-    var bestScore = 0
-
     for (word in WordData.wordsByLength.getValue(15)) {
-        val tttWord = TTTWord(word)
-        if (tttWord.scoreUpperLimit() > bestScore) {
-            val score = tttWord.bestScore
-            if (score > bestScore) {
-                bestScore = score
-                bestTTTWords.clear()
-                bestTTTWords.add(tttWord)
-                println("$tttWord: $bestScore")
-            } else if (score == bestScore) {
-                bestTTTWords.add(tttWord)
-            }
-        }
+        TTTWord(word).findBestScore()
     }
-    println()
 
-    for (tttWord in bestTTTWords) {
-        println("$tttWord: $bestScore")
-        println(tttWord.sideOfCrossWords)
-        println(tttWord.crossWords)
-    }
+    println("$bestTTTWord: ${bestTTTWord?.bestScore}")
+    println(bestTTTWord?.sideOfCrossWords)
+    println(bestTTTWord?.crossWords)
 }
 
 fun findCrossWords() {

@@ -1,61 +1,46 @@
-internal class TTTWord(private val word: Word) {
+class TTTWord(private val word: Word) {
+    // the score excluding cross words
     private val baseScore: Int
-    private var bestPermutation: TTTPermutation? = null
-    val bestScore by lazy { bestScore() }
-    val sideOfCrossWords: WordPosition
-    val crossWords: List<Word>
+    private val bestPermutation = TTTPermutation(word)
+    var sideOfCrossWords: WordPosition? = null
+    var bestScore: Int = 0
+    var crossWords: List<Word>? = null
 
     // Initialize baseScore and sideOfCrossWords
     init {
-        var score = word.score * 27
-
-        val bestStartWords = bestCrossWords(WordData.START_WORDS_BY_SCORE)
-        val bestEndWords = bestCrossWords(WordData.END_WORDS_BY_SCORE)
-
-        val startScore = bestStartWords.score()
-        val endScore = bestEndWords.score()
-
-        if (startScore > endScore) {
-            sideOfCrossWords = WordPosition.START
-            crossWords = bestStartWords
-            score += startScore
-        } else {
-            sideOfCrossWords = WordPosition.END
-            crossWords = bestEndWords
-            score += endScore
-        }
-        baseScore = score
+        bestPermutation.findBest()
+        baseScore = word.score * 27 + bestPermutation.score()
     }
 
-    fun scoreUpperLimit(): Int {
-        var score = word.score
+    /**
+     * Find the best score for this TTT word. Aborts if there can't be a solution better than
+     * [bestTTTWord]. Updates [sideOfCrossWords], [bestScore], and [crossWords] if a new best for this
+     * word is found. Updates [bestTTTWord] if solution is better than current [bestTTTWord].
+     */
+    fun findBestScore() {
+        if (scoreUpperLimit() < bestTTTWord?.bestScore ?: 0) {
+            return
+        }
+
+        sideOfCrossWords = WordPosition.START
+        findBestCrossWords(WordData.START_WORDS_BY_SCORE)
+
+        val prevBestScore = bestScore
+        findBestCrossWords(WordData.END_WORDS_BY_SCORE)
+        if (bestScore != prevBestScore) {
+            sideOfCrossWords = WordPosition.END
+        }
+    }
+
+    private fun scoreUpperLimit(): Int {
+        var score = baseScore
 
         val startScoreUpperLimit = crossWordScoreUpperLimit(WordData.START_WORDS_BY_SCORE)
         val endScoreUpperLimit = crossWordScoreUpperLimit(WordData.END_WORDS_BY_SCORE)
 
         score += maxOf(startScoreUpperLimit, endScoreUpperLimit)
 
-        score += letterScore(word.string[3]) * 27
-        score += letterScore(word.string[11]) * 27
         return score
-    }
-
-    private fun bestScore(): Int {
-        val upperLimit = scoreUpperLimit()
-        val permutation = TTTPermutation(word)
-        var bestScore = 0
-        while (permutation.nextValid()) {
-            val score = permutation.score(baseScore)
-            if (score == upperLimit) {
-                bestPermutation = TTTPermutation(permutation)
-                return score
-            }
-            if (score > bestScore) {
-                bestScore = score
-                bestPermutation = TTTPermutation(permutation)
-            }
-        }
-        return bestScore
     }
 
     private fun crossWordScoreUpperLimit(wordsByScore: LetterArrayMap<List<Word>>): Int =
@@ -64,14 +49,11 @@ internal class TTTWord(private val word: Word) {
                     wordsByScore[word.string[14]].score()
 
 
-    private fun bestCrossWords(wordsByScore: LetterArrayMap<List<Word>>): List<Word> {
+    private fun findBestCrossWords(wordsByScore: LetterArrayMap<List<Word>>) {
         val letterCounts = mutableMapOf<Char, Int>()
         for (letter in word.string) {
             letterCounts[letter] = letterCounts.getOrDefault(letter, 0) + 1
         }
-
-        var bestScore = 0
-        var bestWords = listOf<Word>()
 
         val words1 = wordsByScore[word.string[0]].getAllValid()
 
@@ -90,15 +72,13 @@ internal class TTTWord(private val word: Word) {
                 val score = words.sumBy { it.score }
                 if (score > bestScore) {
                     bestScore = score
-                    bestWords = words
+                    crossWords = words
                 }
             }
         }
-
-        return bestWords
     }
 
-    override fun toString() = bestPermutation?.toString() ?: word.string
+    override fun toString() = bestPermutation.toString()
 }
 
 enum class WordPosition { START, END }
