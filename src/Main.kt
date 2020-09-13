@@ -8,16 +8,17 @@ var bestTTTWord: TTTWord? = null
 
 fun findBestTTTWord() {
     for (word in WordData.wordsByLength.getValue(15)) {
-        println("\n-----$word-----")
+        println("-----$word-----")
         val tttWord = TTTWord(word)
         if (tttWord.usable()) {
             tttWord.findBestScore()
         } else {
             println("Not usable")
         }
+        println()
     }
 
-    println("$bestTTTWord: ${bestTTTWord?.bestScore}")
+    println("$bestTTTWord: ${bestTTTWord?.bestCrossScore}")
     println(bestTTTWord?.sideOfCrossWords)
     println(bestTTTWord?.crossWords)
 }

@@ -3,7 +3,7 @@ class TTTWord(private val word: Word) {
     private val baseScore: Int
     private val bestPermutation = TTTPermutation(word)
     var sideOfCrossWords: WordPosition? = null
-    var bestScore: Int = 0
+    var bestCrossScore: Int = 0
     var crossWords: List<Word>? = null
 
     // Initialize baseScore and sideOfCrossWords
@@ -15,12 +15,12 @@ class TTTWord(private val word: Word) {
 
     /**
      * Find the best score for this TTT word. Aborts if there can't be a solution better than
-     * [bestTTTWord]. Updates [sideOfCrossWords], [bestScore], and [crossWords] if a new best for this
+     * [bestTTTWord]. Updates [sideOfCrossWords], [bestCrossScore], and [crossWords] if a new best for this
      * word is found. Updates [bestTTTWord] if solution is better than current [bestTTTWord].
      * Assumes the ttt word can be played with 7 tiles, meaning a call to [usable] must return true.
      */
     fun findBestScore() {
-        if (scoreUpperLimit() < bestTTTWord?.bestScore ?: 0) {
+        if (scoreUpperLimit() < bestTTTWord?.bestCrossScore ?: 0) {
             return
         }
 
@@ -29,9 +29,9 @@ class TTTWord(private val word: Word) {
         findBestCrossWords(WordData.START_WORDS_BY_SCORE)
 
         println("\nEnd words:")
-        val prevBestScore = bestScore
+        val prevBestScore = bestCrossScore
         findBestCrossWords(WordData.END_WORDS_BY_SCORE)
-        if (bestScore != prevBestScore) {
+        if (bestCrossScore != prevBestScore) {
             sideOfCrossWords = WordPosition.END
         }
     }
@@ -89,11 +89,12 @@ class TTTWord(private val word: Word) {
                         continue
                     }
 
-                    val score = word0.score + word1.score + word2.score
-                    if (score > bestTTTWord.score()) {
-                        bestScore = score
+                    val crossScore = word0.score + word1.score + word2.score
+                    if (crossScore + baseScore > bestTTTWord.score()) {
+                        bestCrossScore = crossScore
                         bestTTTWord = this
                         println("New best: $word0, $word1, $word2")
+                        println("Score: ${score()}")
                     }
                     prevWordIndex2 = wordIndex2
                     break
@@ -109,8 +110,10 @@ class TTTWord(private val word: Word) {
     }
 
     override fun toString() = bestPermutation.toString()
+
+    fun score() = baseScore + bestCrossScore
 }
 
-fun TTTWord?.score() = this?.bestScore ?: 0
+fun TTTWord?.score(): Int = this?.score() ?: 0
 
 enum class WordPosition { START, END }
