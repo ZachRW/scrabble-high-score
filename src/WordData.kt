@@ -58,6 +58,12 @@ object WordData {
             val lengthList = wordsByLength.getOrPut(it.length) { mutableListOf() }
             lengthList.add(Word(it))
         }
+        for (length in wordsByLength.keys) {
+            with(wordsByLength.getValue(length)) {
+                sortBy { it.score }
+                reverse()
+            }
+        }
 
         this.words = words
         this.wordsByLength = wordsByLength

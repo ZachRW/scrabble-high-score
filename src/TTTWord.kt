@@ -8,14 +8,16 @@ class TTTWord(private val word: Word) {
 
     // Initialize baseScore and sideOfCrossWords
     init {
-        bestPermutation.findBest()
-        baseScore = word.score * 27 + bestPermutation.score()
+        baseScore = word.score * 27 + bestPermutation.score
     }
+
+    fun usable(): Boolean = bestPermutation.score != -1
 
     /**
      * Find the best score for this TTT word. Aborts if there can't be a solution better than
      * [bestTTTWord]. Updates [sideOfCrossWords], [bestScore], and [crossWords] if a new best for this
      * word is found. Updates [bestTTTWord] if solution is better than current [bestTTTWord].
+     * Assumes the ttt word can be played with 7 tiles, meaning a call to [usable] must return true.
      */
     fun findBestScore() {
         if (scoreUpperLimit() < bestTTTWord?.bestScore ?: 0) {
@@ -23,8 +25,10 @@ class TTTWord(private val word: Word) {
         }
 
         sideOfCrossWords = WordPosition.START
+        println("Start words:")
         findBestCrossWords(WordData.START_WORDS_BY_SCORE)
 
+        println("\nEnd words:")
         val prevBestScore = bestScore
         findBestCrossWords(WordData.END_WORDS_BY_SCORE)
         if (bestScore != prevBestScore) {
@@ -48,37 +52,65 @@ class TTTWord(private val word: Word) {
                     wordsByScore[word.string[7]].score() +
                     wordsByScore[word.string[14]].score()
 
-
     private fun findBestCrossWords(wordsByScore: LetterArrayMap<List<Word>>) {
-        val letterCounts = mutableMapOf<Char, Int>()
-        for (letter in word.string) {
-            letterCounts[letter] = letterCounts.getOrDefault(letter, 0) + 1
+        val wordLists = arrayOf(
+                wordsByScore[word.string[0]],
+                wordsByScore[word.string[7]],
+                wordsByScore[word.string[14]]
+        )
+        if (wordLists.sumBy { it.score() } <= bestTTTWord.score()) {
+            println("Best case not good enough")
+            return
         }
 
-        val words1 = wordsByScore[word.string[0]].getAllValid()
+        if (!word.letterCounts.withinLetterDistribution()) {
+            println("Can't be played")
+            return
+        }
 
-        for (word1 in words1) {
-            println(word1)
+        val prevWordIndexes2 = Array(wordLists[1].size) { wordLists[2].size }
+        for (word0 in wordLists[0]) {
+            val letterCounts0 = word.letterCounts + word0.letterCounts
+            if (!letterCounts0.withinLetterDistribution()) {
+                continue
+            }
 
-            val words2 = wordsByScore[word.string[7]].getAllValidHavingUsed(word1)
+            var prevWordIndex2 = wordLists[2].size
+            for ((wordIndex1, word1) in wordLists[1].withIndex()) {
+                val letterCounts1 = letterCounts0 + word1.letterCounts
+                if (!letterCounts1.withinLetterDistribution()) {
+                    continue
+                }
 
-            for (word2 in words2) {
-                val words3 = wordsByScore[word.string[14]].getAllValidHavingUsed(word1, word2)
-                if (words3.isEmpty()) continue
+                for (wordIndex2 in 0 until minOf(prevWordIndex2, prevWordIndexes2[wordIndex1])) {
+                    val word2 = wordLists[2][wordIndex2]
+                    val letterCounts2 = letterCounts1 + word2.letterCounts
+                    if (!letterCounts2.withinLetterDistribution()) {
+                        continue
+                    }
 
-                val word3 = words3[0]
-
-                val words = listOf(word1, word2, word3)
-                val score = words.sumBy { it.score }
-                if (score > bestScore) {
-                    bestScore = score
-                    crossWords = words
+                    val score = word0.score + word1.score + word2.score
+                    if (score > bestTTTWord.score()) {
+                        bestScore = score
+                        bestTTTWord = this
+                        println("New best: $word0, $word1, $word2")
+                    }
+                    prevWordIndex2 = wordIndex2
+                    break
+                }
+                if (prevWordIndexes2[wordIndex1] != prevWordIndex2) {
+                    for (i in 0..wordIndex1) {
+                        prevWordIndexes2[i] = prevWordIndex2
+                    }
                 }
             }
         }
+        println("Search complete")
     }
 
     override fun toString() = bestPermutation.toString()
 }
+
+fun TTTWord?.score() = this?.bestScore ?: 0
 
 enum class WordPosition { START, END }

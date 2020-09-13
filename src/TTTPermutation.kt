@@ -1,36 +1,36 @@
-internal class TTTPermutation {
-    private val word: String
-    private val substrings: MutableList<Substring>
+internal class TTTPermutation(word: Word) {
+    private val word: String = word.string
+    private var substrings: MutableList<Substring>
+    val score: Int
 
-    constructor(word: Word) {
-        this.word = word.string
+    init {
         substrings = mutableListOf(
                 Substring(1, 6),
                 Substring(8, 2)
         )
+        score = findBest()
     }
 
-    constructor(permutation: TTTPermutation) {
-        word = permutation.word
-        substrings = permutation.substrings.map { Substring(it) }.toMutableList()
-    }
-
-    fun findBest() {
+    private fun findBest(): Int {
         val upperLimit = letterScore(word[3]) * 27 + letterScore(word[11]) * 27
 
-        var bestScore = 0
+        var bestScore = -1
+        var bestSubstrings = substrings.toMutableList()
         while (nextValid()) {
             val score = score()
             if (score == upperLimit) {
-                return
+                return score
             }
             if (score > bestScore) {
                 bestScore = score
+                bestSubstrings = substrings.toMutableList()
             }
         }
+        substrings = bestSubstrings
+        return bestScore
     }
 
-    fun score(): Int {
+    private fun score(): Int {
         var firstDL = true
         var secondDL = true
         for (substring in substrings) {
@@ -116,7 +116,7 @@ internal class TTTPermutation {
         return true
     }
 
-    fun nextValid(): Boolean {
+    private fun nextValid(): Boolean {
         do {
             if (!permute()) {
                 return false
@@ -135,8 +135,8 @@ internal class TTTPermutation {
     }
 
     internal inner class Substring {
-        var start: Int
-        var end: Int
+        val start: Int
+        val end: Int
         private var validated = false
 
         constructor(start: Int, length: Int) {
