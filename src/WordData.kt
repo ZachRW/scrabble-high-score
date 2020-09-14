@@ -8,7 +8,7 @@ private const val END_WORDS_PATH = "end_words.txt"
 
 data class Word(val string: String) {
     val score = wordScore(string)
-    val letterCounts = LetterCounts(string)
+    val letterCounts = string.toLetterCounts()
 
     override fun toString() = string
 }
@@ -18,8 +18,8 @@ fun List<Word>.score() = sumBy { it.score }
 object WordData {
     val words: Set<String>
     val wordsByLength: Map<Int, List<Word>>
-    val START_WORDS_BY_SCORE: LetterArrayMap<List<Word>>
-    val END_WORDS_BY_SCORE: LetterArrayMap<List<Word>>
+    val START_WORDS_BY_SCORE: LetterToWordList
+    val END_WORDS_BY_SCORE: LetterToWordList
 
     init {
         val words = mutableSetOf<String>()
@@ -67,8 +67,8 @@ object WordData {
 
         this.words = words
         this.wordsByLength = wordsByLength
-        this.START_WORDS_BY_SCORE = LetterArrayMap<List<Word>>(startWordsByScore, emptyList())
-        this.END_WORDS_BY_SCORE = LetterArrayMap<List<Word>>(endWordsByScore, emptyList())
+        this.START_WORDS_BY_SCORE = startWordsByScore.toLetterToWordList()
+        this.END_WORDS_BY_SCORE = endWordsByScore.toLetterToWordList()
     }
 }
 

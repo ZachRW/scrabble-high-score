@@ -20,10 +20,6 @@ class TTTWord(private val word: Word) {
      * Assumes the ttt word can be played with 7 tiles, meaning a call to [usable] must return true.
      */
     fun findBestScore() {
-        if (scoreUpperLimit() < bestTTTWord?.bestCrossScore ?: 0) {
-            return
-        }
-
         sideOfCrossWords = WordPosition.START
         println("Start words:")
         findBestCrossWords(WordData.START_WORDS_BY_SCORE)
@@ -36,23 +32,7 @@ class TTTWord(private val word: Word) {
         }
     }
 
-    private fun scoreUpperLimit(): Int {
-        var score = baseScore
-
-        val startScoreUpperLimit = crossWordScoreUpperLimit(WordData.START_WORDS_BY_SCORE)
-        val endScoreUpperLimit = crossWordScoreUpperLimit(WordData.END_WORDS_BY_SCORE)
-
-        score += maxOf(startScoreUpperLimit, endScoreUpperLimit)
-
-        return score
-    }
-
-    private fun crossWordScoreUpperLimit(wordsByScore: LetterArrayMap<List<Word>>): Int =
-            wordsByScore[word.string[0]].score() +
-                    wordsByScore[word.string[7]].score() +
-                    wordsByScore[word.string[14]].score()
-
-    private fun findBestCrossWords(wordsByScore: LetterArrayMap<List<Word>>) {
+    private fun findBestCrossWords(wordsByScore: LetterToWordList) {
         val wordLists = arrayOf(
                 wordsByScore[word.string[0]],
                 wordsByScore[word.string[7]],
