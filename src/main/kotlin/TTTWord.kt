@@ -21,10 +21,8 @@ class TTTWord(private val word: Word) {
      */
     fun findBestScore() {
         sideOfCrossWords = WordPosition.START
-        println("Start words:")
         findBestCrossWords(WordData.START_WORDS_BY_SCORE)
 
-        println("\nEnd words:")
         val prevBestScore = bestCrossScore
         findBestCrossWords(WordData.END_WORDS_BY_SCORE)
         if (bestCrossScore != prevBestScore) {
@@ -39,12 +37,12 @@ class TTTWord(private val word: Word) {
                 wordsByScore[word.string[14]]
         )
         if (wordLists.sumBy { it.score() } <= bestTTTWord.score()) {
-            println("Best case not good enough")
+            println("$word: Best case not good enough")
             return
         }
 
         if (!word.letterCounts.withinLetterDistribution()) {
-            println("Can't be played")
+            println("$word: Can't be played")
             return
         }
 
@@ -73,8 +71,8 @@ class TTTWord(private val word: Word) {
                     if (crossScore + baseScore > bestTTTWord.score()) {
                         bestCrossScore = crossScore
                         bestTTTWord = this
-                        println("New best: $word0, $word1, $word2")
-                        println("Score: ${score()}")
+                        println("$word: New best: $word0, $word1, $word2")
+                        println("$word: Score: ${score() + 50}")
                     }
                     prevWordIndex2 = wordIndex2
                     break
@@ -86,7 +84,6 @@ class TTTWord(private val word: Word) {
                 }
             }
         }
-        println("Search complete")
     }
 
     override fun toString() = bestPermutation.toString()
