@@ -13,8 +13,6 @@ data class Word(val string: String) {
     override fun toString() = string
 }
 
-fun List<Word>.score() = sumBy { it.score }
-
 object WordData {
     val words: Set<String>
     val wordsByLength: Map<Int, List<Word>>

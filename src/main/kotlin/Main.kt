@@ -1,6 +1,3 @@
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.FileWriter
 
 fun main() {
@@ -10,23 +7,18 @@ fun main() {
 var bestTTTWord: TTTWord? = null
 
 fun findBestTTTWord() {
-    runBlocking {
-        for (word in WordData.wordsByLength.getValue(15)) {
-            launch(Dispatchers.Default) {
-                println("$word: Start")
-                val tttWord = TTTWord(word)
-                if (tttWord.usable()) {
-                    tttWord.findBestScore()
-                } else {
-                    println("$word: Not usable")
-                }
-                println("$word: End")
-            }
+    for (word in WordData.wordsByLength.getValue(15)) {
+        println("=====$word=====")
+        val tttWord = TTTWord(word)
+        if (tttWord.usable()) {
+            tttWord.findBestScore()
+        } else {
+            println("Not usable")
         }
-        println("All coroutines launched")
+        println()
     }
 
-    println("$bestTTTWord: ${bestTTTWord?.bestCrossScore?.plus(50)}")
+    println("$bestTTTWord: ${bestTTTWord.score() + 50}")
     println(bestTTTWord?.sideOfCrossWords)
     println(bestTTTWord?.crossWords)
 }

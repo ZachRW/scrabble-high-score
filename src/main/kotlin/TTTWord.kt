@@ -21,9 +21,11 @@ class TTTWord(private val word: Word) {
      */
     fun findBestScore() {
         sideOfCrossWords = WordPosition.START
+        println("Start words:")
         findBestCrossWords(WordData.START_WORDS_BY_SCORE)
 
         val prevBestScore = bestCrossScore
+        println("\nEnd words:")
         findBestCrossWords(WordData.END_WORDS_BY_SCORE)
         if (bestCrossScore != prevBestScore) {
             sideOfCrossWords = WordPosition.END
@@ -36,13 +38,17 @@ class TTTWord(private val word: Word) {
                 wordsByScore[word.string[7]],
                 wordsByScore[word.string[14]]
         )
-        if (wordLists.sumBy { it.score() } <= bestTTTWord.score()) {
-            println("$word: Best case not good enough")
+
+        if (wordLists.any { it.isEmpty() }) {
+            println("Not all TWs can have a cross word")
             return
         }
-
+        if (wordLists.sumBy { it[0].score } + baseScore <= bestTTTWord.score()) {
+            println("Best case not good enough")
+            return
+        }
         if (!word.letterCounts.withinLetterDistribution()) {
-            println("$word: Can't be played")
+            println("Can't be played")
             return
         }
 
@@ -70,9 +76,10 @@ class TTTWord(private val word: Word) {
                     val crossScore = word0.score + word1.score + word2.score
                     if (crossScore + baseScore > bestTTTWord.score()) {
                         bestCrossScore = crossScore
+                        crossWords = listOf(word0, word1, word2)
                         bestTTTWord = this
-                        println("$word: New best: $word0, $word1, $word2")
-                        println("$word: Score: ${score() + 50}")
+                        println("New best: $word0, $word1, $word2")
+                        println("Score: ${score() + 50}")
                     }
                     prevWordIndex2 = wordIndex2
                     break
@@ -84,6 +91,7 @@ class TTTWord(private val word: Word) {
                 }
             }
         }
+        println("Search complete")
     }
 
     override fun toString() = bestPermutation.toString()
