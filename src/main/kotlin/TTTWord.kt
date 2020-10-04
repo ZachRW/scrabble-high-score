@@ -52,22 +52,19 @@ class TTTWord(private val word: Word) {
             return
         }
 
-        val prevWordIndexes2 = Array(wordLists[1].size) { wordLists[2].size }
         for (word0 in wordLists[0]) {
             val letterCounts0 = word.letterCounts + word0.letterCounts
             if (!letterCounts0.withinLetterDistribution()) {
                 continue
             }
 
-            var prevWordIndex2 = wordLists[2].size
-            for ((wordIndex1, word1) in wordLists[1].withIndex()) {
+            for (word1 in wordLists[1]) {
                 val letterCounts1 = letterCounts0 + word1.letterCounts
                 if (!letterCounts1.withinLetterDistribution()) {
                     continue
                 }
 
-                for (wordIndex2 in 0 until minOf(prevWordIndex2, prevWordIndexes2[wordIndex1])) {
-                    val word2 = wordLists[2][wordIndex2]
+                for (word2 in wordLists[2]) {
                     val letterCounts2 = letterCounts1 + word2.letterCounts
                     if (!letterCounts2.withinLetterDistribution()) {
                         continue
@@ -81,13 +78,7 @@ class TTTWord(private val word: Word) {
                         println("New best: $word0, $word1, $word2")
                         println("Score: ${score() + 50}")
                     }
-                    prevWordIndex2 = wordIndex2
                     break
-                }
-                if (prevWordIndexes2[wordIndex1] != prevWordIndex2) {
-                    for (i in 0..wordIndex1) {
-                        prevWordIndexes2[i] = prevWordIndex2
-                    }
                 }
             }
         }
