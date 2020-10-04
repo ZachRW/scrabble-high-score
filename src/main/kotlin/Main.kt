@@ -13,7 +13,7 @@ fun findBestTTTWord() {
         if (tttWord.usable()) {
             tttWord.findBestScore()
         } else {
-            println("Not usable")
+            println("Can't start with TWs uncovered")
         }
         println()
     }

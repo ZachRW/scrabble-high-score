@@ -8,7 +8,7 @@ class TTTWord(private val word: Word) {
 
     // Initialize baseScore and sideOfCrossWords
     init {
-        baseScore = word.score * 27 + bestPermutation.score
+        baseScore = (word.score + bestPermutation.score) * 27
     }
 
     fun usable(): Boolean = bestPermutation.score != -1
@@ -43,7 +43,7 @@ class TTTWord(private val word: Word) {
             println("Not all TWs can have a cross word")
             return
         }
-        if (wordLists.sumBy { it[0].score } + baseScore <= bestTTTWord.score()) {
+        if (3 * wordLists.sumBy { it[0].score } + baseScore <= bestTTTWord.score()) {
             println("Best case not good enough")
             return
         }
@@ -73,7 +73,7 @@ class TTTWord(private val word: Word) {
                         continue
                     }
 
-                    val crossScore = word0.score + word1.score + word2.score
+                    val crossScore = 3 * (word0.score + word1.score + word2.score)
                     if (crossScore + baseScore > bestTTTWord.score()) {
                         bestCrossScore = crossScore
                         crossWords = listOf(word0, word1, word2)
